@@ -94,21 +94,25 @@ def add_transactions():
                 )
             )
             if ctgry == 1:
-                inc_ctgry = input(
-                    "Enter the type of income: \n\n1. Enter 1 for salary 2. Enter 2 for others"
+                inc_ctgry = int(
+                    input(
+                        "Enter the type of income: \n\n1. Enter 1 for salary 2. Enter 2 for others"
+                    )
                 )
                 if inc_ctgry == 1:
                     category = "salary"
                 elif inc_ctgry == 2:
                     category = "others"
             elif ctgry == 2:
-                exp_ctgry = input(
-                    "Enter the type of expense: \n\n\
+                exp_ctgry = int(
+                    input(
+                        "Enter the type of expense: \n\n\
                                 1. Enter 1 for Food\n\
                                 2. Enter 2 for Entertainment\n\
                                 3. Enter 3 for Travel\n\
                                 4. Enter 4 for Personal\n\
                                 5. Enter 5 for Miscellaneuos"
+                    )
                 )
                 if exp_ctgry == 1:
                     category = "Food"
@@ -169,7 +173,7 @@ def view_transactions_category():
         if options == 1:
             category = "salary"
         elif options == 2:
-            category == "others"
+            category = "others"
     elif choice == 2:
         ttype = "expense"
         options = int(
@@ -194,11 +198,11 @@ def view_transactions_category():
             category = "Miscellaneuos"
     print("Your selected transactions are: \n\n")
     found = False
+    n = 0
     for i in all_transactions_list:
-        n = 0
         if i[1] == ttype and i[3] == category:
             print("Index: ", n, " ", i)
-        found = True
+            found = True
         n += 1
     if not found:
         print("No entry has been found!")
