@@ -1,11 +1,14 @@
-
-
 from datetime import datetime
+import json
+import os
+
 
 
 # global variables
 all_transactions_list = []
+save_all_transactions_list = []
 budgets = {}
+save_budgets = {}
 
 
 # Main menu function
@@ -182,14 +185,17 @@ def view_transactions():
     elif choice == 3:
         start_date = get_datetime_input()
         end_date = get_datetime_input()
+        found = False
         b = 1
         for i in all_transactions_list:
             if start_date == end_date and i[0] == start_date:
                 print(b,". ",i)
-            elif i[0] >= start_date and i <= end_date:
+                found = True
+            elif i[0] >= start_date and i[0] <= end_date:
                 print(b,". ",i)
-            else:
-                print("There are no entires entered for the selected dates!")
+                found = True
+        if not found:
+            print("There are no entires entered for the selected dates!")
     else:
         print("Please enter a valid choice!!!")
 
@@ -328,18 +334,18 @@ def summary():
                 elif i[1] == "expense" and i[3] == "Miscellaneuos":
                     expense += i[2]
                     Miscellaneuos += i[2]
-            print(
-                f"The summary of your transactions for the month {summary_month.month} of year {summary_month.year} are: \n\n",
-                f"Income: {income}\n",
-                f"Salary: {salary}\n",
-                f"Other_income: {others}\n",
-                f"Expense: {expense}\n",
-                f"Food: {Food}\n",
-                f"Entertainment: {Entertainment}\n",
-                f"Travel: {Travel}\n",
-                f"Personal: {Personal}\n",
-                f"Miscellaneuos: {Miscellaneuos}\n",
-            )
+        print(
+            f"The summary of your transactions for the month {summary_month.month} of year {summary_month.year} are: \n\n",
+            f"Income: {income}\n",
+            f"Salary: {salary}\n",
+            f"Other_income: {others}\n",
+            f"Expense: {expense}\n",
+            f"Food: {Food}\n",
+            f"Entertainment: {Entertainment}\n",
+            f"Travel: {Travel}\n",
+            f"Personal: {Personal}\n",
+            f"Miscellaneuos: {Miscellaneuos}\n",
+        )
 
 
 
@@ -373,6 +379,7 @@ def budget_status():
     Travel = 0
     Personal = 0
     Miscellaneuos = 0
+    list_of_items = []
     for i in all_transactions_list:
         if i[0].month == status_month.month and i[0].year == status_month.year:
             if i[1] == "income" and i[3] == "salary":
@@ -396,12 +403,20 @@ def budget_status():
             elif i[1] == "expense" and i[3] == "Miscellaneuos":
                 expense += i[2]
                 Miscellaneuos += i[2]
+    for i,j in budgets.items():
+        if i.month == status_month.month and i.year == status_month.year:
+            for key,values in j.items():
+                list_of_items.append(values)
+    if list_of_items:
+        expense_budget_total = sum(list_of_items)
+    else:
+        expense_budget_total = 0
     print(
         f"The budget status of your transactions for the month {status_month.month} of year {status_month.year} are: \n\n",
         f"Total Income for the month: {income}\n",
         f"Salary for the month: {salary}\n",
         f"Other_income for the month: {others}\n",
-        f"Expense for the month: {expense} and budget for expense for month {to be entered}\n",
+        f"Expense for the month: {expense} and budget for expense for month {expense_budget_total}\n",
         f"Food expense for the month is: {Food} and budget for Food for month is {budgets[status_month]["Food"]}\n",
         f"Entertainment for the month is: {Entertainment} and budget for Entertainment for the month is {budgets[status_month]["Entertainment"]}\n",
         f"Travel for the month is: {Travel} and budget for travel for the month is {budgets[status_month]["Travel"]}\n",
@@ -410,11 +425,61 @@ def budget_status():
     )
     
      
+def save_files():
+    global all_transactions_list
+    global save_all_transactions_list
+    save_all_transactions_list = []
+    i = 0
+    for a in all_transactions_list:
+        entries = list(a)
+        save_all_transactions_list.append(entries)
+        i += 1
+    for b in save_all_transactions_list:
+        b[0] = b[0].strftime("%d/%m/%Y")
+    with open('all_transactions_list.json','w') as file:
+        json.dump(save_all_transactions_list,file,indent=4)
+    global budgets
+    global save_budgets
+    save_budgets = {}
+    j = 0
+    for key,value in budgets.items():
+        key_save = key.strftime("%m/%Y")
+        save_budgets[key_save] = value
+    with open('budgets.json','w') as dict_file:
+        json.dump(save_budgets,dict_file,indent=4)
+
+
+def load_files():
+    global all_transactions_list
+    if os.path.exists('all_transactions_list.json'):
+        with open('all_transactions_list.json', 'r') as list_file:
+            save_all_transactions_list = json.load(list_file)
+        num = 0
+        for i in save_all_transactions_list:
+            i[0] = datetime.strptime(i[0],"%d/%m/%Y")
+            i = tuple(i)
+            save_all_transactions_list[num] = i
+            num += 1
+        all_transactions_list = list(save_all_transactions_list)
+    else:
+        all_transactions_list = []
+    global budgets
+    if os.path.exists('budgets.json'):
+        with open('budgets.json','r') as budgets_dict:
+            save_budgets = json.load(budgets_dict)
+        for key,value in save_budgets.items():
+            chng_key = datetime.strptime(key, "%m/%Y")
+            budgets[chng_key] = value
+    else:
+        budgets = {}
+
+
 def reports():
 
 
 
 def main():
+    load_files()
     while True:
         main_menu()
         entry = user_menu_input()
@@ -433,9 +498,13 @@ def main():
         elif entry == 7:
             reports()
         elif entry == 8:
+            save_files()
             break
         elif entry not in {1, 2, 3, 4, 5, 6, 7, 8} or entry == -1:
             print("Enter valid input!!!")
 
 
+
+
+#starting the program
 main()
