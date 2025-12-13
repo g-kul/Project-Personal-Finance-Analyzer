@@ -1,16 +1,11 @@
+
+
 from datetime import datetime
 
 
 # global variables
 all_transactions_list = []
 budgets = {}
-
-'''total_budget = 0
-Food_budget = 0
-Entertainment_budget = 0
-Travel_budget = 0
-Personal_budget = 0
-Miscellaneous_budget = 0'''
 
 
 # Main menu function
@@ -46,18 +41,16 @@ def get_datetime_input():
         try:
             date_formatted = datetime.strptime(date_str, "%d/%m/%Y")
             return date_formatted
-            break
         except:
             print("Enter a valid date in the specified format")
 
 
-def get_budget_month():
+def get_month():
     while True:
-        month_str = input('Enter the budget month in "mm/yyyy" format: ')
+        month_str = input('Enter the month in "mm/yyyy" format: ')
         try:
             month_formatted = datetime.strptime(month_str, "%m/%Y")
             return month_formatted
-            break
         except:
             print("Enter a valid month in the specified format")
 
@@ -126,16 +119,38 @@ def add_transactions():
                 category,
                 expense_description,
             ]
-            for date as key in budget dictionary:
-                if dictionary[date][month] == entry[0][month]:
-                    sum = 0
-                    for all_transactions_list:
-                        sum += all_transactions_list[date][category][amount]
-            if sum > budget_dictioinary[category][amount]:
-                print(f"You have gone over budget for category {entry[3]} for month {entry[0][month]}")
-                print("Do you want to still continue with adding this and editing monthly budget OR cancel this entry")
-            result = tuple(entry)
-            all_transactions_list.append(result)
+            if budgets != {}:
+                for dte in budgets:
+                    if dte.month == entry[0].month and dte.year == entry[0].year:
+                        sum = 0
+                        for i in all_transactions_list:
+                            if i[3] == entry[3]:
+                                sum += i[2]
+                        sum += entry[2]
+                        if sum > budgets[dte][entry[3]]:
+                            print(
+                                f"You will go over budget for category {entry[3]} for month {entry[0].month}"
+                            )
+                            option = int(
+                                input(
+                                    (
+                                        "Do you want to still continue with adding this and editing monthly budget press 1 OR enter 0 to cancel this entry"
+                                    )
+                                )
+                            )
+                            if option == 1:
+                                result = tuple(entry)
+                                all_transactions_list.append(result)
+                                global budgets
+                                set_budget()
+                            elif option == 2:
+                                break
+                        else:
+                            result = tuple(entry)
+                            all_transactions_list.append(result)
+            elif budgets == {}:
+                result = tuple(entry)
+                all_transactions_list.append(result)
         elif choice == 0:
             break
         elif choice not in {0, 1} or choice == -1:
@@ -145,14 +160,40 @@ def add_transactions():
 
 
 def view_transactions():
-    if all_transactions_list == []:
-        print("You havent entered any transcations yet!")
-    else:
-        n = 1
+    choice = int(input("Enter the transcations you wish to view: \nEnter 1 to view all transactions you have entered so far\n \
+                        Enter 2 to view transcations by month\n \
+                        or Enter 3 to show transactions for a range of dates you have entered"))
+    if choice == 1:
+        if all_transactions_list == []:
+            print("You havent entered any transcations yet!")
+        else:
+            n = 1
+            for i in all_transactions_list:
+                print("Each transaction done by you are:  ")
+                print(n, ". ", i)
+                n += 1
+    elif choice == 2:
+        month_option = get_month()
+        a = 1
         for i in all_transactions_list:
-            print("Each transaction done by you are:  ")
-            print(n, ". ", i)
-            n += 1
+            if i[0].month == month_option.month and i[0].year == month_option.year:
+                print(a,". ",i)
+                a += 1
+    elif choice == 3:
+        start_date = get_datetime_input()
+        end_date = get_datetime_input()
+        b = 1
+        for i in all_transactions_list:
+            if start_date == end_date and i[0] == start_date:
+                print(b,". ",i)
+            elif i[0] >= start_date and i <= end_date:
+                print(b,". ",i)
+            else:
+                print("There are no entires entered for the selected dates!")
+    else:
+        print("Please enter a valid choice!!!")
+
+
 
 
 def view_transactions_category():
@@ -198,11 +239,14 @@ def view_transactions_category():
             category = "Personal"
         elif options == 5:
             category = "Miscellaneuos"
-    print("Your selected transactions are: \n\n")
+    else:
+        print("Please enter a valid choice!!!")
+    month_choice = get_month()
+    print(f"Your selected transactions for the month {month_choice.month} in {month_choice.year}are: \n\n")
     found = False
     n = 0
     for i in all_transactions_list:
-        if i[1] == ttype and i[3] == category:
+        if (i[1] == ttype and i[3] == category) and (i[0].month == month_choice.month and i[0].year == month_choice.year):
             print("Index: ", n, " ", i)
             found = True
         n += 1
@@ -211,7 +255,115 @@ def view_transactions_category():
 
 
 def summary():
-    print("The summary of your entire transactions are:  ")
+    income = 0
+    expense = 0
+    salary = 0
+    others = 0
+    Food = 0
+    Entertainment = 0
+    Travel = 0
+    Personal = 0
+    Miscellaneuos = 0
+    choice = int(input("Enter the choice of viewing your transactions summary\nEnter 1 for viewing entire summary\nEnter 2 for viewing summary for month of choice: "))
+    if choice == 1:
+        print("The summary of your entire transactions are:  ")
+        for i in all_transactions_list:
+            if i[1] == "income" and i[3] == "salary":
+                income += i[2]
+                salary += i[2]
+            elif i[1] == "income" and i[3] == "others":
+                income += i[2]
+                others += i[2]
+            elif i[1] == "expense" and i[3] == "Food":
+                expense += i[2]
+                Food += i[2]
+            elif i[1] == "expense" and i[3] == "Entertainment":
+                expense += i[2]
+                Entertainment += i[2]
+            elif i[1] == "expense" and i[3] == "Travel":
+                expense += i[2]
+                Travel += i[2]
+            elif i[1] == "expense" and i[3] == "Personal":
+                expense += i[2]
+                Personal += i[2]
+            elif i[1] == "expense" and i[3] == "Miscellaneuos":
+                expense += i[2]
+                Miscellaneuos += i[2]
+
+        print(
+            "The summary of your transactions are: \n\n",
+            f"Income: {income}\n",
+            f"Salary: {salary}\n",
+            f"Other_income: {others}\n",
+            f"Expense: {expense}\n",
+            f"Food: {Food}\n",
+            f"Entertainment: {Entertainment}\n",
+            f"Travel: {Travel}\n",
+            f"Personal: {Personal}\n",
+            f"Miscellaneuos: {Miscellaneuos}\n",
+        )
+    elif choice == 2:
+        summary_month = get_month()
+        print("The summary of your entire transactions are:  ")
+        for i in all_transactions_list:
+            if i[0].month == summary_month.month and i[0].year == summary_month.year:
+                if i[1] == "income" and i[3] == "salary":
+                    income += i[2]
+                    salary += i[2]
+                elif i[1] == "income" and i[3] == "others":
+                    income += i[2]
+                    others += i[2]
+                elif i[1] == "expense" and i[3] == "Food":
+                    expense += i[2]
+                    Food += i[2]
+                elif i[1] == "expense" and i[3] == "Entertainment":
+                    expense += i[2]
+                    Entertainment += i[2]
+                elif i[1] == "expense" and i[3] == "Travel":
+                    expense += i[2]
+                    Travel += i[2]
+                elif i[1] == "expense" and i[3] == "Personal":
+                    expense += i[2]
+                    Personal += i[2]
+                elif i[1] == "expense" and i[3] == "Miscellaneuos":
+                    expense += i[2]
+                    Miscellaneuos += i[2]
+            print(
+                f"The summary of your transactions for the month {summary_month.month} of year {summary_month.year} are: \n\n",
+                f"Income: {income}\n",
+                f"Salary: {salary}\n",
+                f"Other_income: {others}\n",
+                f"Expense: {expense}\n",
+                f"Food: {Food}\n",
+                f"Entertainment: {Entertainment}\n",
+                f"Travel: {Travel}\n",
+                f"Personal: {Personal}\n",
+                f"Miscellaneuos: {Miscellaneuos}\n",
+            )
+
+
+
+def set_budget():
+    global budgets
+    print("Enter the month for which you wish to set the budget below")
+    budget_month = get_month()
+    Food_budget = float(input("Enter the budget for food: "))
+    Entertainment_budget = float(input("Enter the budget for Entertainment: "))
+    Travel_budget = float(input("Enter the budget for Travel: "))
+    Personal_budget = float(input("Enter the budget for Personal: "))
+    Miscellaneous_budget = float(input("Enter the budget for Miscellaneous: "))
+    budget_targets = {
+        "Food": Food_budget,
+        "Entertainment": Entertainment_budget,
+        "Travel": Travel_budget,
+        "Personal": Personal_budget,
+        "Miscellaneuos": Miscellaneous_budget,
+    }
+    budgets[budget_month] = budget_targets
+
+
+def budget_status():
+    status_month = get_month()
     income = 0
     expense = 0
     salary = 0
@@ -222,81 +374,44 @@ def summary():
     Personal = 0
     Miscellaneuos = 0
     for i in all_transactions_list:
-        if i[1] == "income" and i[3] == "salary":
-            income += i[2]
-            salary += i[2]
-        elif i[1] == "income" and i[3] == "others":
-            income += i[2]
-            others += i[2]
-        elif i[1] == "expense" and i[3] == "Food":
-            expense += i[2]
-            Food += i[2]
-        elif i[1] == "expense" and i[3] == "Entertainment":
-            expense += i[2]
-            Entertainment += i[2]
-        elif i[1] == "expense" and i[3] == "Travel":
-            expense += i[2]
-            Travel += i[2]
-        elif i[1] == "expense" and i[3] == "Personal":
-            expense += i[2]
-            Personal += i[2]
-        elif i[1] == "expense" and i[3] == "Miscellaneuos":
-            expense += i[2]
-            Miscellaneuos += i[2]
-
+        if i[0].month == status_month.month and i[0].year == status_month.year:
+            if i[1] == "income" and i[3] == "salary":
+                income += i[2]
+                salary += i[2]
+            elif i[1] == "income" and i[3] == "others":
+                income += i[2]
+                others += i[2]
+            elif i[1] == "expense" and i[3] == "Food":
+                expense += i[2]
+                Food += i[2]
+            elif i[1] == "expense" and i[3] == "Entertainment":
+                expense += i[2]
+                Entertainment += i[2]
+            elif i[1] == "expense" and i[3] == "Travel":
+                expense += i[2]
+                Travel += i[2]
+            elif i[1] == "expense" and i[3] == "Personal":
+                expense += i[2]
+                Personal += i[2]
+            elif i[1] == "expense" and i[3] == "Miscellaneuos":
+                expense += i[2]
+                Miscellaneuos += i[2]
     print(
-        "The summary of your transactions are: \n\n",
-        f"Income: {income}\n",
-        f"Salary: {salary}\n",
-        f"Other_income: {others}\n",
-        f"Expense: {expense}\n",
-        f"Food: {Food}\n",
-        f"Entertainment: {Entertainment}\n",
-        f"Travel: {Travel}\n",
-        f"Personal: {Personal}\n",
-        f"Miscellaneuos: {Miscellaneuos}\n",
+        f"The budget status of your transactions for the month {status_month.month} of year {status_month.year} are: \n\n",
+        f"Total Income for the month: {income}\n",
+        f"Salary for the month: {salary}\n",
+        f"Other_income for the month: {others}\n",
+        f"Expense for the month: {expense} and budget for expense for month {to be entered}\n",
+        f"Food expense for the month is: {Food} and budget for Food for month is {budgets[status_month]["Food"]}\n",
+        f"Entertainment for the month is: {Entertainment} and budget for Entertainment for the month is {budgets[status_month]["Entertainment"]}\n",
+        f"Travel for the month is: {Travel} and budget for travel for the month is {budgets[status_month]["Travel"]}\n",
+        f"Personal for the month is: {Personal} and budget for Personal expenses for the month is {budgets[status_month]["Personal"]}\n",
+        f"Miscellaneuos for the month is: {Miscellaneuos} and the budget for Miscellaneuos expenses for the month is {budgets[status_month]["Miscellaneuos"]}\n",
     )
+    
+     
+def reports():
 
-
-def set_budget():
-    global budgets
-    budget_month = get_budget_month()
-    Food_budget = float(input("Enter the budget for food: "))
-    Entertainment_budget = float(input("Enter the budget for Entertainment: "))
-    Travel_budget = float(input("Enter the budget for Travel: "))
-    Personal_budget = float(input("Enter the budget for Personal: "))
-    Miscellaneous_budget = float(input("Enter the budget for Miscellaneous: "))
-    budget_targets = {"Food":Food_budget,"Entertainment":Entertainment_budget,"Travel":Travel_budget,"Personal":Personal_budget,"Miscellaneuos":Miscellaneous_budget}
-    budgets[budget_month] = budget_targets
-
-
-
-def budget_status():
-    for i in all_transactions_list:
-        if i[1] == "income" and i[3] == "salary":
-            income += i[2]
-            salary += i[2]
-        elif i[1] == "income" and i[3] == "others":
-            income += i[2]
-            others += i[2]
-        elif i[1] == "expense" and i[3] == "Food":
-            expense += i[2]
-            Food += i[2]
-        elif i[1] == "expense" and i[3] == "Entertainment":
-            expense += i[2]
-            Entertainment += i[2]
-        elif i[1] == "expense" and i[3] == "Travel":
-            expense += i[2]
-            Travel += i[2]
-        elif i[1] == "expense" and i[3] == "Personal":
-            expense += i[2]
-            Personal += i[2]
-        elif i[1] == "expense" and i[3] == "Miscellaneuos":
-            expense += i[2]
-            Miscellaneuos += i[2]
-
-
-# def reports():
 
 
 def main():
