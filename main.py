@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 import os
-
+import matplotlib.pyplot as plt
 
 
 # global variables
@@ -100,7 +100,7 @@ def add_transactions():
                                 2. Enter 2 for Entertainment\n\
                                 3. Enter 3 for Travel\n\
                                 4. Enter 4 for Personal\n\
-                                5. Enter 5 for Miscellaneuos"
+                                5. Enter 5 for Miscellaneous"
                     )
                 )
                 if exp_ctgry == 1:
@@ -112,7 +112,7 @@ def add_transactions():
                 elif exp_ctgry == 4:
                     category = "Personal"
                 elif exp_ctgry == 5:
-                    category = "Miscellaneuos"
+                    category = "Miscellaneous"
             amount = float(input("Enter the amount of transaction: "))
             expense_description = input("Enter the description for your transaction: ")
             entry = [
@@ -146,8 +146,8 @@ def add_transactions():
                                 all_transactions_list.append(result)
                                 global budgets
                                 set_budget()
-                            elif option == 2:
-                                break
+                            elif option == 0:
+                                return
                         else:
                             result = tuple(entry)
                             all_transactions_list.append(result)
@@ -163,9 +163,13 @@ def add_transactions():
 
 
 def view_transactions():
-    choice = int(input("Enter the transcations you wish to view: \nEnter 1 to view all transactions you have entered so far\n \
+    choice = int(
+        input(
+            "Enter the transcations you wish to view: \nEnter 1 to view all transactions you have entered so far\n \
                         Enter 2 to view transcations by month\n \
-                        or Enter 3 to show transactions for a range of dates you have entered"))
+                        or Enter 3 to show transactions for a range of dates you have entered"
+        )
+    )
     if choice == 1:
         if all_transactions_list == []:
             print("You havent entered any transcations yet!")
@@ -180,7 +184,7 @@ def view_transactions():
         a = 1
         for i in all_transactions_list:
             if i[0].month == month_option.month and i[0].year == month_option.year:
-                print(a,". ",i)
+                print(a, ". ", i)
                 a += 1
     elif choice == 3:
         start_date = get_datetime_input()
@@ -189,17 +193,17 @@ def view_transactions():
         b = 1
         for i in all_transactions_list:
             if start_date == end_date and i[0] == start_date:
-                print(b,". ",i)
+                print(b, ". ", i)
+                b += 1
                 found = True
             elif i[0] >= start_date and i[0] <= end_date:
-                print(b,". ",i)
+                print(b, ". ", i)
+                b += 1
                 found = True
         if not found:
             print("There are no entires entered for the selected dates!")
     else:
         print("Please enter a valid choice!!!")
-
-
 
 
 def view_transactions_category():
@@ -232,7 +236,7 @@ def view_transactions_category():
                         2. Enter 2 seeing under Entertainment\n\
                         3. Enter 3 seeing under Travel\n\
                         4. Enter 4 seeing under Personal\n\
-                        5. Enter 5 seeing under Miscellaneuos"
+                        5. Enter 5 seeing under Miscellaneous"
             )
         )
         if options == 1:
@@ -244,15 +248,19 @@ def view_transactions_category():
         elif options == 4:
             category = "Personal"
         elif options == 5:
-            category = "Miscellaneuos"
+            category = "Miscellaneous"
     else:
         print("Please enter a valid choice!!!")
     month_choice = get_month()
-    print(f"Your selected transactions for the month {month_choice.month} in {month_choice.year}are: \n\n")
+    print(
+        f"Your selected transactions for the month {month_choice.month} in {month_choice.year}are: \n\n"
+    )
     found = False
     n = 0
     for i in all_transactions_list:
-        if (i[1] == ttype and i[3] == category) and (i[0].month == month_choice.month and i[0].year == month_choice.year):
+        if (i[1] == ttype and i[3] == category) and (
+            i[0].month == month_choice.month and i[0].year == month_choice.year
+        ):
             print("Index: ", n, " ", i)
             found = True
         n += 1
@@ -269,8 +277,12 @@ def summary():
     Entertainment = 0
     Travel = 0
     Personal = 0
-    Miscellaneuos = 0
-    choice = int(input("Enter the choice of viewing your transactions summary\nEnter 1 for viewing entire summary\nEnter 2 for viewing summary for month of choice: "))
+    Miscellaneous = 0
+    choice = int(
+        input(
+            "Enter the choice of viewing your transactions summary\nEnter 1 for viewing entire summary\nEnter 2 for viewing summary for month of choice: "
+        )
+    )
     if choice == 1:
         print("The summary of your entire transactions are:  ")
         for i in all_transactions_list:
@@ -292,9 +304,9 @@ def summary():
             elif i[1] == "expense" and i[3] == "Personal":
                 expense += i[2]
                 Personal += i[2]
-            elif i[1] == "expense" and i[3] == "Miscellaneuos":
+            elif i[1] == "expense" and i[3] == "Miscellaneous":
                 expense += i[2]
-                Miscellaneuos += i[2]
+                Miscellaneous += i[2]
 
         print(
             "The summary of your transactions are: \n\n",
@@ -306,7 +318,7 @@ def summary():
             f"Entertainment: {Entertainment}\n",
             f"Travel: {Travel}\n",
             f"Personal: {Personal}\n",
-            f"Miscellaneuos: {Miscellaneuos}\n",
+            f"Miscellaneous: {Miscellaneous}\n",
         )
     elif choice == 2:
         summary_month = get_month()
@@ -331,9 +343,9 @@ def summary():
                 elif i[1] == "expense" and i[3] == "Personal":
                     expense += i[2]
                     Personal += i[2]
-                elif i[1] == "expense" and i[3] == "Miscellaneuos":
+                elif i[1] == "expense" and i[3] == "Miscellaneous":
                     expense += i[2]
-                    Miscellaneuos += i[2]
+                    Miscellaneous += i[2]
         print(
             f"The summary of your transactions for the month {summary_month.month} of year {summary_month.year} are: \n\n",
             f"Income: {income}\n",
@@ -344,9 +356,8 @@ def summary():
             f"Entertainment: {Entertainment}\n",
             f"Travel: {Travel}\n",
             f"Personal: {Personal}\n",
-            f"Miscellaneuos: {Miscellaneuos}\n",
+            f"Miscellaneous: {Miscellaneous}\n",
         )
-
 
 
 def set_budget():
@@ -363,13 +374,14 @@ def set_budget():
         "Entertainment": Entertainment_budget,
         "Travel": Travel_budget,
         "Personal": Personal_budget,
-        "Miscellaneuos": Miscellaneous_budget,
+        "Miscellaneous": Miscellaneous_budget,
     }
     budgets[budget_month] = budget_targets
 
 
 def budget_status():
     status_month = get_month()
+    budget_exists = False
     income = 0
     expense = 0
     salary = 0
@@ -378,53 +390,58 @@ def budget_status():
     Entertainment = 0
     Travel = 0
     Personal = 0
-    Miscellaneuos = 0
+    Miscellaneous = 0
     list_of_items = []
-    for i in all_transactions_list:
-        if i[0].month == status_month.month and i[0].year == status_month.year:
-            if i[1] == "income" and i[3] == "salary":
-                income += i[2]
-                salary += i[2]
-            elif i[1] == "income" and i[3] == "others":
-                income += i[2]
-                others += i[2]
-            elif i[1] == "expense" and i[3] == "Food":
-                expense += i[2]
-                Food += i[2]
-            elif i[1] == "expense" and i[3] == "Entertainment":
-                expense += i[2]
-                Entertainment += i[2]
-            elif i[1] == "expense" and i[3] == "Travel":
-                expense += i[2]
-                Travel += i[2]
-            elif i[1] == "expense" and i[3] == "Personal":
-                expense += i[2]
-                Personal += i[2]
-            elif i[1] == "expense" and i[3] == "Miscellaneuos":
-                expense += i[2]
-                Miscellaneuos += i[2]
-    for i,j in budgets.items():
-        if i.month == status_month.month and i.year == status_month.year:
-            for key,values in j.items():
-                list_of_items.append(values)
-    if list_of_items:
-        expense_budget_total = sum(list_of_items)
-    else:
-        expense_budget_total = 0
+    for keys in budgets:
+        if keys.month == status_month.month and keys.year == status_month.year:
+            budget_exists = True
+            for i in all_transactions_list:
+                if i[0].month == status_month.month and i[0].year == status_month.year:
+                    if i[1] == "income" and i[3] == "salary":
+                        income += i[2]
+                        salary += i[2]
+                    elif i[1] == "income" and i[3] == "others":
+                        income += i[2]
+                        others += i[2]
+                    elif i[1] == "expense" and i[3] == "Food":
+                        expense += i[2]
+                        Food += i[2]
+                    elif i[1] == "expense" and i[3] == "Entertainment":
+                        expense += i[2]
+                        Entertainment += i[2]
+                    elif i[1] == "expense" and i[3] == "Travel":
+                        expense += i[2]
+                        Travel += i[2]
+                    elif i[1] == "expense" and i[3] == "Personal":
+                        expense += i[2]
+                        Personal += i[2]
+                    elif i[1] == "expense" and i[3] == "Miscellaneous":
+                        expense += i[2]
+                        Miscellaneous += i[2]
+            for i, j in budgets.items():
+                if i.month == status_month.month and i.year == status_month.year:
+                    for key, values in j.items():
+                        list_of_items.append(values)
+            if list_of_items:
+                expense_budget_total = sum(list_of_items)
+            else:
+                expense_budget_total = 0
     print(
         f"The budget status of your transactions for the month {status_month.month} of year {status_month.year} are: \n\n",
         f"Total Income for the month: {income}\n",
         f"Salary for the month: {salary}\n",
         f"Other_income for the month: {others}\n",
         f"Expense for the month: {expense} and budget for expense for month {expense_budget_total}\n",
-        f"Food expense for the month is: {Food} and budget for Food for month is {budgets[status_month]["Food"]}\n",
-        f"Entertainment for the month is: {Entertainment} and budget for Entertainment for the month is {budgets[status_month]["Entertainment"]}\n",
-        f"Travel for the month is: {Travel} and budget for travel for the month is {budgets[status_month]["Travel"]}\n",
-        f"Personal for the month is: {Personal} and budget for Personal expenses for the month is {budgets[status_month]["Personal"]}\n",
-        f"Miscellaneuos for the month is: {Miscellaneuos} and the budget for Miscellaneuos expenses for the month is {budgets[status_month]["Miscellaneuos"]}\n",
+        f"Food expense for the month is: {Food} and budget for Food for month is {budgets[status_month]['Food']}\n",
+        f"Entertainment for the month is: {Entertainment} and budget for Entertainment for the month is {budgets[status_month]['Entertainment']}\n",
+        f"Travel for the month is: {Travel} and budget for travel for the month is {budgets[status_month]['Travel']}\n",
+        f"Personal for the month is: {Personal} and budget for Personal expenses for the month is {budgets[status_month]['Personal']}\n",
+        f"Miscellaneous for the month is: {Miscellaneous} and the budget for Miscellaneous expenses for the month is {budgets[status_month]['Miscellaneous']}\n",
     )
-    
-     
+    if not budget_exists:
+        print("There is no budget setup for the entered month!!!")
+
+
 def save_files():
     global all_transactions_list
     global save_all_transactions_list
@@ -436,27 +453,26 @@ def save_files():
         i += 1
     for b in save_all_transactions_list:
         b[0] = b[0].strftime("%d/%m/%Y")
-    with open('all_transactions_list.json','w') as file:
-        json.dump(save_all_transactions_list,file,indent=4)
+    with open("all_transactions_list.json", "w") as file:
+        json.dump(save_all_transactions_list, file, indent=4)
     global budgets
     global save_budgets
     save_budgets = {}
-    j = 0
-    for key,value in budgets.items():
+    for key, value in budgets.items():
         key_save = key.strftime("%m/%Y")
         save_budgets[key_save] = value
-    with open('budgets.json','w') as dict_file:
-        json.dump(save_budgets,dict_file,indent=4)
+    with open("budgets.json", "w") as dict_file:
+        json.dump(save_budgets, dict_file, indent=4)
 
 
 def load_files():
     global all_transactions_list
-    if os.path.exists('all_transactions_list.json'):
-        with open('all_transactions_list.json', 'r') as list_file:
+    if os.path.exists("all_transactions_list.json"):
+        with open("all_transactions_list.json", "r") as list_file:
             save_all_transactions_list = json.load(list_file)
         num = 0
         for i in save_all_transactions_list:
-            i[0] = datetime.strptime(i[0],"%d/%m/%Y")
+            i[0] = datetime.strptime(i[0], "%d/%m/%Y")
             i = tuple(i)
             save_all_transactions_list[num] = i
             num += 1
@@ -464,10 +480,10 @@ def load_files():
     else:
         all_transactions_list = []
     global budgets
-    if os.path.exists('budgets.json'):
-        with open('budgets.json','r') as budgets_dict:
+    if os.path.exists("budgets.json"):
+        with open("budgets.json", "r") as budgets_dict:
             save_budgets = json.load(budgets_dict)
-        for key,value in save_budgets.items():
+        for key, value in save_budgets.items():
             chng_key = datetime.strptime(key, "%m/%Y")
             budgets[chng_key] = value
     else:
@@ -475,7 +491,301 @@ def load_files():
 
 
 def reports():
+    global all_transactions_list
+    global budgets
+    option = int(
+        input(
+            "Enter 1 for getting reports based on entire data\nEnter 2 for getting reports based on month of choice"
+        )
+    )
+    if option == 1:
+        choice = int(
+            input(
+                "Enter 1 for spending by category and expense breakdown\nEnter 2 for expense vs budget by category\n \
+                            Enter 3 for total income vs Expense"
+            )
+        )
+        total_income_1 = 0
+        Food_count_1 = 0
+        Food_amount_1 = 0
+        Entertainment_count_1 = 0
+        Entertainment_amount_1 = 0
+        Travel_count_1 = 0
+        Travel_amount_1 = 0
+        Personal_count_1 = 0
+        Personal_amount_1 = 0
+        Miscellaneous_count_1 = 0
+        Miscellaneous_amount_1 = 0
+        for i in all_transactions_list:
+            if i[1] == "expense" and i[3] == "Food":
+                Food_count_1 += 1
+                Food_amount_1 += i[2]
+            elif i[1] == "expense" and i[3] == "Entertainment":
+                Entertainment_count_1 += 1
+                Entertainment_amount_1 += i[2]
+            elif i[1] == "expense" and i[3] == "Travel":
+                Travel_count_1 += 1
+                Travel_amount_1 += i[2]
+            elif i[1] == "expense" and i[3] == "Personal":
+                Personal_count_1 += 1
+                Personal_amount_1 += i[2]
+            elif i[1] == "expense" and i[3] == "Miscellaneous":
+                Miscellaneous_count_1 += 1
+                Miscellaneous_amount_1 += i[2]
+            elif i[1] == "income":
+                total_income_1 += i[2]
 
+        total_expense = (
+            Food_amount_1
+            + Entertainment_amount_1
+            + Travel_amount_1
+            + Personal_amount_1
+            + Miscellaneous_amount_1
+        )
+
+        Food_budget_total = 0
+        Entertainment_budget_total = 0
+        Travel_budget_total = 0
+        Personal_budget_total = 0
+        Miscellaneous_budget_total = 0
+        for value in budgets.values():
+            for a, b in value.items():
+                if a == "Food":
+                    Food_budget_total += b
+                elif a == "Entertainment":
+                    Entertainment_budget_total += b
+                elif a == "Travel":
+                    Travel_budget_total += b
+                elif a == "Personal":
+                    Personal_budget_total += b
+                elif a == "Miscellaneous":
+                    Miscellaneous_budget_total += b
+        total_budget_list = [
+            Food_budget_total,
+            Entertainment_budget_total,
+            Travel_budget_total,
+            Personal_budget_total,
+            Miscellaneous_budget_total,
+        ]
+
+        categories_list = [
+            "Food",
+            "Entertainment",
+            "Travel",
+            "Personal",
+            "Miscellaneous",
+        ]
+        spending_category = [
+            Food_amount_1,
+            Entertainment_amount_1,
+            Travel_amount_1,
+            Personal_amount_1,
+            Miscellaneous_amount_1,
+        ]
+        category_breakdown = [
+            Food_count_1,
+            Entertainment_count_1,
+            Travel_count_1,
+            Personal_count_1,
+            Miscellaneous_count_1,
+        ]
+        if choice == 1:
+            # for bar chart
+            colors = ["red", "blue", "green", "yellow", "orange"]
+            plt.bar(categories_list, spending_category, width=1, color=colors)
+            plt.xlabel("Expense Categories")
+            plt.ylabel("Amount spent")
+            plt.title("Total spending by category")
+            plt.show()
+            # for piechart
+            plt.pie(category_breakdown, labels=categories_list, colors=colors)
+            plt.title("Expense breakdown by number of spending")
+            plt.show()
+            plt.pie(spending_category, labels=categories_list, colors=colors)
+            plt.title("Expense breakdown by amount of spending")
+            plt.show()
+        elif choice == 2:
+            # for grouped bar chart
+            x = list(range(len(categories_list)))
+            width = 0.4
+            plt.bar(
+                [i - width / 2 for i in x],
+                spending_category,
+                width,
+                label="total amount spent",
+                color="blue",
+            )
+            plt.bar(
+                [i + width / 2 for i in x],
+                total_budget_list,
+                width,
+                label="total budget",
+                color="orange",
+            )
+            plt.xticks(x, categories_list)
+            plt.legend()
+            plt.show()
+        elif choice == 3:
+            income_dict = {}
+            expense_dict = {}
+            for i in all_transactions_list:
+                if i[1] == "income":
+                    date_month = i[0].strftime("%m-%Y")
+                    income_dict[date_month] = income_dict.get(date_month, 0) + i[2]
+                elif i[1] == "expense":
+                    date_month_2 = i[0].strftime("%m-%Y")
+                    expense_dict[date_month_2] = (
+                        expense_dict.get(date_month_2, 0) + i[2]
+                    )
+            months_sort = sorted(set(income_dict.keys()) | set(expense_dict.keys()))
+            income_values_sort = [income_dict.get(m, 0) for m in months_sort]
+            expense_values_sort = [expense_dict.get(n, 0) for n in months_sort]
+            plt.plot(months_sort, income_values_sort, label="Income", color="green")
+            plt.plot(months_sort, expense_values_sort, label="Expense", color="orange")
+            plt.legend()
+            plt.show()
+
+    elif option == 2:
+        choice = int(
+            input(
+                "Enter 1 for spending by category and expense breakdown for the month\nEnter 2 for expense vs budget for month"
+            )
+        )
+        month_choice = get_month()
+
+        total_income_1 = 0
+        Food_count_1 = 0
+        Food_amount_1 = 0
+        Entertainment_count_1 = 0
+        Entertainment_amount_1 = 0
+        Travel_count_1 = 0
+        Travel_amount_1 = 0
+        Personal_count_1 = 0
+        Personal_amount_1 = 0
+        Miscellaneous_count_1 = 0
+        Miscellaneous_amount_1 = 0
+        found = False
+        for i in all_transactions_list:
+            if i[0].month == month_choice.month and i[0].year == month_choice.year:
+                found = True
+                if i[1] == "expense" and i[3] == "Food":
+                    Food_count_1 += 1
+                    Food_amount_1 += i[2]
+                elif i[1] == "expense" and i[3] == "Entertainment":
+                    Entertainment_count_1 += 1
+                    Entertainment_amount_1 += i[2]
+                elif i[1] == "expense" and i[3] == "Travel":
+                    Travel_count_1 += 1
+                    Travel_amount_1 += i[2]
+                elif i[1] == "expense" and i[3] == "Personal":
+                    Personal_count_1 += 1
+                    Personal_amount_1 += i[2]
+                elif i[1] == "expense" and i[3] == "Miscellaneous":
+                    Miscellaneous_count_1 += 1
+                    Miscellaneous_amount_1 += i[2]
+                elif i[1] == "income":
+                    total_income_1 += i[2]
+        if not found:
+            print("Your entered month is not there in entered transactioins")
+
+        total_expense = (
+            Food_amount_1
+            + Entertainment_amount_1
+            + Travel_amount_1
+            + Personal_amount_1
+            + Miscellaneous_amount_1
+        )
+
+        Food_budget_total = 0
+        Entertainment_budget_total = 0
+        Travel_budget_total = 0
+        Personal_budget_total = 0
+        Miscellaneous_budget_total = 0
+        found_2 = False
+        for key, value in budgets.items():
+            if key.month == month_choice.month and key.year == month_choice.year:
+                found_2 = True
+                for a, b in value.items():
+                    if a == "Food":
+                        Food_budget_total += b
+                    elif a == "Entertainment":
+                        Entertainment_budget_total += b
+                    elif a == "Travel":
+                        Travel_budget_total += b
+                    elif a == "Personal":
+                        Personal_budget_total += b
+                    elif a == "Miscellaneous":
+                        Miscellaneous_budget_total += b
+        if not found_2:
+            print("The entered month is not setup in your budgets")
+        total_budget_list = [
+            Food_budget_total,
+            Entertainment_budget_total,
+            Travel_budget_total,
+            Personal_budget_total,
+            Miscellaneous_budget_total,
+        ]
+        categories_list = [
+            "Food",
+            "Entertainment",
+            "Travel",
+            "Personal",
+            "Miscellaneous",
+        ]
+        spending_category = [
+            Food_amount_1,
+            Entertainment_amount_1,
+            Travel_amount_1,
+            Personal_amount_1,
+            Miscellaneous_amount_1,
+        ]
+        category_breakdown = [
+            Food_count_1,
+            Entertainment_count_1,
+            Travel_count_1,
+            Personal_count_1,
+            Miscellaneous_count_1,
+        ]
+        if choice == 1:
+            # for bar chart
+            colors = ["red", "blue", "green", "yellow", "orange"]
+            plt.bar(categories_list, spending_category, width=1, color=colors)
+            plt.xlabel("Expense Categories for the month")
+            plt.ylabel("Amount spent for the month")
+            plt.title(f"Total spending by category for the month {month_choice}")
+            plt.show()
+            # for piechart
+            plt.pie(category_breakdown, labels=categories_list, colors=colors)
+            plt.title(
+                f"Expense breakdown by number of spending for the month {month_choice}"
+            )
+            plt.show()
+            plt.pie(spending_category, labels=categories_list, colors=colors)
+            plt.title(
+                f"Expense breakdown by amount of spending for the month {month_choice}"
+            )
+            plt.show()
+        elif choice == 2:
+            # for grouped bar chart
+            x = list(range(len(categories_list)))
+            width = 0.4
+            plt.bar(
+                [i - width / 2 for i in x],
+                spending_category,
+                width,
+                label=f"total amount spent for the month {month_choice}",
+                color="blue",
+            )
+            plt.bar(
+                [i + width / 2 for i in x],
+                total_budget_list,
+                width,
+                label=f"total budget for the month {month_choice}",
+                color="orange",
+            )
+            plt.xticks(x, categories_list)
+            plt.legend()
+            plt.show()
 
 
 def main():
@@ -504,7 +814,5 @@ def main():
             print("Enter valid input!!!")
 
 
-
-
-#starting the program
+# starting the program
 main()
